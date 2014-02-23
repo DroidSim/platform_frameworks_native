@@ -45,7 +45,61 @@
 #define MAX_NUMBER_OF_GL_EXTENSIONS 256
 
 
+#ifdef ANDROID_GNU_LINUX
+/* clayc: copied from bionic/libc/private/__get_tls.h */
+#if defined(__aarch64__)
+# define __get_tls() ({ void** __val; __asm__("mrs %0, tpidr_el0" : "=r"(__val)); __val; })
+#elif defined(__arm__)
+# define __get_tls() ({ void** __val; __asm__("mrc p15, 0, %0, c13, c0, 3" : "=r"(__val)); __val; })
+#elif defined(__mips__)
+# define __get_tls() \
+    /* On mips32r1, this goes via a kernel illegal instruction trap that's optimized for v1. */ \
+    ({ register void** __val asm("v1"); \
+       __asm__(".set    push\n" \
+               ".set    mips32r2\n" \
+               "rdhwr   %0,$29\n" \
+               ".set    pop\n" : "=r"(__val)); \
+       __val; })
+#elif defined(__i386__)
+# define __get_tls() ({ void** __val; __asm__("movl %%gs:0, %0" : "=r"(__val)); __val; })
+#elif defined(__x86_64__)
+# define __get_tls() ({ void** __val; __asm__("mov %%fs:0, %0" : "=r"(__val)); __val; })
+#else
+#error unsupported architecture
+#endif
+/* __get_tls.h */
+/* clayc: copied from bionic/libc/private/bionic_tls.h */
+/* Well-known TLS slots. What data goes in which slot is arbitrary unless otherwise noted. */
+enum {
+  TLS_SLOT_SELF = 0, /* The kernel requires this specific slot for x86. */
+  TLS_SLOT_THREAD_ID,
+  TLS_SLOT_ERRNO,
+
+  /* This slot in the child's TLS is used to synchronize the parent and child
+   * during thread initialization. The child finishes with this mutex before
+   * running any code that can set errno, so we can reuse the errno slot. */
+  TLS_SLOT_START_MUTEX = TLS_SLOT_ERRNO,
+
+  /* These two aren't used by bionic itself, but allow the graphics code to
+   * access TLS directly rather than using the pthread API. */
+  TLS_SLOT_OPENGL_API = 3,
+  TLS_SLOT_OPENGL = 4,
+
+  /* This slot is only used to pass information from the dynamic linker to
+   * libc.so when the C library is loaded in to memory. The C runtime init
+   * function will then clear it. Since its use is extremely temporary,
+   * we reuse an existing location that isn't needed during libc startup. */
+  TLS_SLOT_BIONIC_PREINIT = TLS_SLOT_OPENGL_API,
+
+  TLS_SLOT_STACK_GUARD = 5, /* GCC requires this specific slot for x86. */
+  TLS_SLOT_DLERROR,
+
+  TLS_SLOT_FIRST_USER_SLOT /* Must come last! */
+};
+/* bionic_tls.h */
+#else
 #include <bionic_tls.h>  /* special private C library header */
+#endif
 
 // ----------------------------------------------------------------------------
 namespace android {

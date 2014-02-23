@@ -25,7 +25,9 @@
 #include <GLES2/gl2ext.h>
 
 #include <cutils/log.h>
+#ifndef ANDROID_GNU_LINUX
 #include <cutils/properties.h>
+#endif
 
 #include "../hooks.h"
 #include "../egl_impl.h"

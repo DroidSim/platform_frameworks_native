@@ -25,7 +25,9 @@
 #include "egl_object.h"
 #include "egl_tls.h"
 #include "Loader.h"
+#ifndef ANDROID_GNU_LINUX
 #include <cutils/properties.h>
+#endif
 
 // ----------------------------------------------------------------------------
 namespace android {
@@ -203,6 +205,7 @@ EGLBoolean egl_display_t::initialize(EGLint *major, EGLint *minor) {
 
     egl_cache_t::get()->initialize(this);
 
+#ifndef ANDROID_GNU_LINUX
     char value[PROPERTY_VALUE_MAX];
     property_get("debug.egl.finish", value, "0");
     if (atoi(value)) {
@@ -213,6 +216,7 @@ EGLBoolean egl_display_t::initialize(EGLint *major, EGLint *minor) {
     if (atoi(value)) {
         traceGpuCompletion = true;
     }
+#endif
 
     refs++;
     if (major != NULL)

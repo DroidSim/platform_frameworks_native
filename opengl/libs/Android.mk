@@ -35,9 +35,11 @@ LOCAL_SRC_FILES:= 	       \
 LOCAL_SHARED_LIBRARIES += libcutils libutils liblog libGLES_trace
 LOCAL_MODULE:= libEGL
 LOCAL_LDFLAGS += -Wl,--exclude-libs=ALL
+ifneq ($(TARGET_OS),gnu_linux)
 LOCAL_SHARED_LIBRARIES += libdl
 # we need to access the private Bionic header <bionic_tls.h>
 LOCAL_C_INCLUDES += bionic/libc/private
+endif
 
 LOCAL_CFLAGS += -DLOG_TAG=\"libEGL\"
 LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES -DEGL_EGLEXT_PROTOTYPES
@@ -80,9 +82,11 @@ LOCAL_SRC_FILES:= 		\
 LOCAL_SHARED_LIBRARIES += libcutils liblog libEGL
 LOCAL_MODULE:= libGLESv1_CM
 
+ifneq ($(TARGET_OS),gnu_linux)
 LOCAL_SHARED_LIBRARIES += libdl
 # we need to access the private Bionic header <bionic_tls.h>
 LOCAL_C_INCLUDES += bionic/libc/private
+endif
 
 LOCAL_CFLAGS += -DLOG_TAG=\"libGLESv1\"
 LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES -DEGL_EGLEXT_PROTOTYPES
@@ -104,9 +108,11 @@ LOCAL_SRC_FILES:= 		\
 LOCAL_SHARED_LIBRARIES += libcutils libutils liblog libEGL
 LOCAL_MODULE:= libGLESv2
 
+ifneq ($(TARGET_OS),gnu_linux)
 LOCAL_SHARED_LIBRARIES += libdl
 # we need to access the private Bionic header <bionic_tls.h>
 LOCAL_C_INCLUDES += bionic/libc/private
+endif
 
 LOCAL_CFLAGS += -DLOG_TAG=\"libGLESv2\"
 LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES -DEGL_EGLEXT_PROTOTYPES

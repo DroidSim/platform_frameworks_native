@@ -24,7 +24,9 @@
 #include <dirent.h>
 
 #include <cutils/log.h>
+#ifndef ANDROID_GNU_LINUX
 #include <cutils/properties.h>
+#endif
 
 #include <EGL/egl.h>
 
@@ -75,6 +77,7 @@ ANDROID_SINGLETON_STATIC_INSTANCE( Loader )
 static int
 checkGlesEmulationStatus(void)
 {
+#ifndef ANDROID_GNU_LINUX
     /* We're going to check for the following kernel parameters:
      *
      *    qemu=1                      -> tells us that we run inside the emulator
@@ -94,6 +97,9 @@ checkGlesEmulationStatus(void)
     /* We are in the emulator, get GPU status value */
     property_get("ro.kernel.qemu.gles",prop,"0");
     return atoi(prop);
+#else
+    return 0;
+#endif
 }
 
 // ----------------------------------------------------------------------------

@@ -30,7 +30,9 @@
 #include <cutils/log.h>
 #include <cutils/atomic.h>
 #include <cutils/compiler.h>
+#ifndef ANDROID_GNU_LINUX
 #include <cutils/properties.h>
+#endif
 #include <cutils/memory.h>
 
 #include <utils/KeyedVector.h>
@@ -297,6 +299,7 @@ EGLBoolean eglChooseConfig( EGLDisplay dpy, const EGLint *attrib_list,
     egl_connection_t* const cnx = &gEGLImpl;
     if (cnx->dso) {
         if (attrib_list) {
+#ifndef ANDROID_GNU_LINUX
             char value[PROPERTY_VALUE_MAX];
             property_get("debug.egl.force_msaa", value, "false");
 
@@ -347,6 +350,7 @@ EGLBoolean eglChooseConfig( EGLDisplay dpy, const EGLint *attrib_list,
                     }
                 }
             }
+#endif
         }
 
         res = cnx->egl.eglChooseConfig(
@@ -990,12 +994,16 @@ public:
         }
         {
             Mutex::Autolock lock(thread->mMutex);
+#ifndef ANDROID_GNU_LINUX
             ScopedTrace st(ATRACE_TAG, String8::format("kicked off frame %d",
                     thread->mFramesQueued).string());
+#endif
             thread->mQueue.push_back(sync);
             thread->mCondition.signal();
             thread->mFramesQueued++;
+#ifndef ANDROID_GNU_LINUX
             ATRACE_INT("GPU Frames Outstanding", thread->mQueue.size());
+#endif
         }
     }
 
@@ -1015,8 +1023,10 @@ private:
         }
         EGLDisplay dpy = eglGetDisplay(EGL_DEFAULT_DISPLAY);
         {
+#ifndef ANDROID_GNU_LINUX
             ScopedTrace st(ATRACE_TAG, String8::format("waiting for frame %d",
                     frameNum).string());
+#endif
             EGLint result = eglClientWaitSyncKHR(dpy, sync, 0, EGL_FOREVER_KHR);
             if (result == EGL_FALSE) {
                 ALOGE("FrameCompletion: error waiting for fence: %#x", eglGetError());
@@ -1029,7 +1039,9 @@ private:
             Mutex::Autolock lock(mMutex);
             mQueue.removeAt(0);
             mFramesCompleted++;
+#ifndef ANDROID_GNU_LINUX
             ATRACE_INT("GPU Frames Outstanding", mQueue.size());
+#endif
         }
         return true;
     }

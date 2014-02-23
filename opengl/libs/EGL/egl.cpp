@@ -26,7 +26,9 @@
 
 #include <cutils/log.h>
 #include <cutils/atomic.h>
+#ifndef ANDROID_GNU_LINUX
 #include <cutils/properties.h>
+#endif
 
 #include <utils/CallStack.h>
 #include <utils/String8.h>
@@ -106,6 +108,7 @@ gl_hooks_t const* getGLTraceThreadSpecific() {
 }
 
 void initEglTraceLevel() {
+#ifndef ANDROID_GNU_LINUX
     char value[PROPERTY_VALUE_MAX];
     property_get("debug.egl.trace", value, "0");
 
@@ -125,9 +128,11 @@ void initEglTraceLevel() {
     int propertyLevel = atoi(value);
     int applicationLevel = sEGLApplicationTraceLevel;
     sEGLTraceLevel = propertyLevel > applicationLevel ? propertyLevel : applicationLevel;
+#endif
 }
 
 void initEglDebugLevel() {
+#ifndef ANDROID_GNU_LINUX
     if (getEGLDebugLevel() == 0) {
         char value[PROPERTY_VALUE_MAX];
 
@@ -159,6 +164,7 @@ void initEglDebugLevel() {
             setEGLDebugLevel(0);
         }
     }
+#endif
 }
 
 void setGLHooksThreadSpecific(gl_hooks_t const *value) {
@@ -220,11 +226,13 @@ static int gl_no_context() {
         } else {
             LOG_ALWAYS_FATAL(error);
         }
+#ifndef ANDROID_GNU_LINUX
         char value[PROPERTY_VALUE_MAX];
         property_get("debug.egl.callstack", value, "0");
         if (atoi(value)) {
             CallStack stack(LOG_TAG);
         }
+#endif
     }
     return 0;
 }
@@ -332,11 +340,13 @@ EGLBoolean egl_init_drivers() {
 
 void gl_unimplemented() {
     ALOGE("called unimplemented OpenGL ES API");
+#ifndef ANDROID_GNU_LINUX
     char value[PROPERTY_VALUE_MAX];
     property_get("debug.egl.callstack", value, "0");
     if (atoi(value)) {
         CallStack stack(LOG_TAG);
     }
+#endif
 }
 
 void gl_noop() {

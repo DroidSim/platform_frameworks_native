@@ -18,7 +18,9 @@
 #include <pthread.h>
 
 #include <cutils/log.h>
+#ifndef ANDROID_GNU_LINUX
 #include <cutils/properties.h>
+#endif
 
 #include <utils/CallStack.h>
 
@@ -75,11 +77,13 @@ void egl_tls_t::setErrorEtcImpl(
         if (!quiet) {
             ALOGE("%s:%d error %x (%s)",
                     caller, line, error, egl_strerror(error));
+#ifndef ANDROID_GNU_LINUX
             char value[PROPERTY_VALUE_MAX];
             property_get("debug.egl.callstack", value, "0");
             if (atoi(value)) {
                 CallStack stack(LOG_TAG);
             }
+#endif
         }
         tls->error = error;
     }

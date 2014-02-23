@@ -17,7 +17,9 @@
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include <cutils/log.h>
+#ifndef ANDROID_GNU_LINUX
 #include <cutils/properties.h>
+#endif
 
 #include "hooks.h"
 #include "glestrace.h"
@@ -123,6 +125,7 @@ int GLTrace_start() {
         goto done;
     }
 
+#ifndef ANDROID_GNU_LINUX
     char udsName[PROPERTY_VALUE_MAX];
     property_get("debug.egl.debug_portname", udsName, "gltrace");
     clientSocket = gltrace::acceptClientConnection(udsName);
@@ -141,6 +144,7 @@ int GLTrace_start() {
     sGLTraceState = new GLTraceState(stream);
 
     pthread_create(&sReceiveThreadId, NULL, commandReceiveTask, sGLTraceState);
+#endif
 
 done:
     pthread_mutex_unlock(&sGlTraceStateLock);
