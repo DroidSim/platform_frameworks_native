@@ -23,6 +23,9 @@
 #include <utils/String16.h>
 #include <utils/Vector.h>
 #include <utils/Flattenable.h>
+#ifdef ANDROID_GNU_LINUX
+#include <linux/types.h>
+#endif
 #include <linux/binder.h>
 
 // ---------------------------------------------------------------------------
