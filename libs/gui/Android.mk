@@ -49,6 +49,10 @@ ifeq ($(TARGET_BOARD_PLATFORM), tegra3)
 	LOCAL_CFLAGS += -DDONT_USE_FENCE_SYNC
 endif
 
+ifeq ($(TARGET_OS),gnu_linux)
+LOCAL_LDLIBS += -lpthread
+endif
+
 include $(BUILD_SHARED_LIBRARY)
 
 ifeq (,$(ONE_SHOT_MAKEFILE))
