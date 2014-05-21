@@ -35,7 +35,9 @@ LOCAL_SRC_FILES:= 	       \
 LOCAL_SHARED_LIBRARIES += libcutils libutils liblog libGLES_trace
 LOCAL_MODULE:= libEGL
 LOCAL_LDFLAGS += -Wl,--exclude-libs=ALL
-ifneq ($(TARGET_OS),gnu_linux)
+ifeq ($(TARGET_OS),gnu_linux)
+LOCAL_LDLIBS := -ldl -lpthread
+else
 LOCAL_SHARED_LIBRARIES += libdl
 # we need to access the private Bionic header <bionic_tls.h>
 LOCAL_C_INCLUDES += bionic/libc/private
